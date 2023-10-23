@@ -1,0 +1,72 @@
+version: "2.2"
+
+services:
+  postgres:
+    image: postgres:13.0
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  initdb:
+    build: .
+    depends_on:
+      - postgres
+    environment: &airflow-common-env
+      AIRFLOW_HOME: /root/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    command: bash -c "airflow db init && airflow users create --firstname admin --lastname admin --email admin --password admin --username admin --role Admin"
+
+  webserver:
+    build: .
+    depends_on:
+      - initdb
+    environment:
+      <<: *airflow-common-env
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+    volumes:
+      - ./dags:/root/airflow/dags
+      - ./plugins:/root/airflow/plugins
+      - airflow-worker-logs:/root/airflow/logs
+    ports:
+      - "8080:8080"
+    command: airflow webserver
+
+  scheduler:
+    build: .
+    depends_on:
+      - webserver
+    environment:
+      <<: *airflow-common-env
+    volumes:
+      - ./dags:/root/airflow/dags
+      - ./plugins:/root/airflow/plugins
+      - airflow-worker-logs:/root/airflow/logs
+    command: airflow scheduler
+
+  test:
+    build: .
+    environment:
+      AIRFLOW_HOME: /repo
+    working_dir: /repo
+    volumes:
+      - .:/repo
+    entrypoint: make internal-test
+
+  lint:
+    build: .
+    working_dir: /repo
+    volumes:
+      - .:/repo
+    entrypoint: make internal-lint
+
+volumes:
+  postgres: {}
+  airflow-worker-logs:
