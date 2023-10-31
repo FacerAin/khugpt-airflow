@@ -1,3 +1,4 @@
+
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -85,7 +86,7 @@ collect_khu_today = PythonOperator(
     task_id="collect_khu_today", python_callable=print_test, op_kwargs={'context': "khu_today"}, dag=dag
 )
 collect_example1 = PythonOperator(
-    task_id="collect_example1", python_callable=print_test, op_kwargs={'context': "collect_example1"}, dag=dag
+    task_id="collect_swedu", python_callable=print_test, op_kwargs={'context': "collect_swedu"}, dag=dag
 )
 collect_example2 = PythonOperator(
     task_id="collect_example2", python_callable=print_test, op_kwargs={'context': "collect_example1"}, dag=dag
