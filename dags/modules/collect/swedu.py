@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from langchain.document_loaders import AsyncHtmlLoader
 from langchain.document_transformers import Html2TextTransformer
 from tqdm import tqdm
+from typing import List, Dict
 
 from dags.modules.database.pymongo import PymongoClient
 
@@ -43,14 +44,24 @@ class SweduCollector:
             )
 
         return items
+    
+    def _clean_json_documents(self, json_documents: List[Dict]):
+        clean_json_documents = []
+        for document in json_documents:
+            document['page_content'] = self._clean_page_content(document['page_content'])
+            clean_json_documents.append(document
+        )
+        return clean_json_documents
+    
+    def _clean_page_content(self, page_content: str):
+        # Remove the header section based on the "## 공지사항"
+        clean_page_content = ' '.join(page_content.split("## 공지사항")[1:])
 
-    def _check_datetime_range(
-        self,
-        input_date: datetime.date,
-        start_date: datetime.date,
-        end_date: datetime.date,
-    ):
-        return start_date <= input_date <= end_date
+        # Remove the footer section based on the "* __다음글"
+        clean_page_content = ' '.join(clean_page_content.split("* __목록")[:-1])
+
+        return clean_page_content
+
 
     def _get_links(self, start_date, end_date, max_page: int = 34):
         # TODO: How to determine max page?
@@ -64,14 +75,21 @@ class SweduCollector:
             )
             soup = BeautifulSoup(response.text, "html.parser")
             for item in soup.select("#fboardlist > div > table > tbody > tr"):
+                if item.select(".notice_icon"):
+                    print("notice")
+                    continue
                 link = item.find("a").get("href")
                 content_date = datetime.strptime(
                     item.select(".td_datetime")[0].getText(), "%Y-%m-%d"
                 ).date()
-                if not self._check_datetime_range(content_date, start_date, end_date):
+
+                if end_date < content_date:
+                    continue
+                elif start_date > content_date:
                     is_break = True
                     break
-                links.append(link)
+                else:
+                    links.append(link)
         return links
 
     def _get_documents(self, links):
@@ -80,4 +98,5 @@ class SweduCollector:
         documents = loader.load()
         transform_documents = html2text.transform_documents(documents)
         json_documents = self._convert_to_json(transform_documents)
+        json_documents = self._clean_json_documents(json_documents)
         return json_documents
