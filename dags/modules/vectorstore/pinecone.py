@@ -4,7 +4,7 @@ import os
 from dags.modules.utils import singleton
 import openai
 from dotenv import load_dotenv
-from typing import List, Dict
+from typing import Dict
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
