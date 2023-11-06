@@ -16,7 +16,7 @@ class ExampleHook(BaseHook):
 
 
 class ExamplePlugin(AirflowPlugin):
-    """ Example Plugin """
+    """Example Plugin"""
 
     name = "example_plugin"
     hooks = [ExampleHook]

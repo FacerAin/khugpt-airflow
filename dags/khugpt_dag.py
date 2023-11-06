@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -28,7 +27,6 @@ from datetime import timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
-
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -83,26 +81,49 @@ def print_test(context):
 
 
 collect_khu_today = PythonOperator(
-    task_id="collect_khu_today", python_callable=print_test, op_kwargs={'context': "khu_today"}, dag=dag
+    task_id="collect_khu_today",
+    python_callable=print_test,
+    op_kwargs={"context": "khu_today"},
+    dag=dag,
 )
 collect_example1 = PythonOperator(
-    task_id="collect_swedu", python_callable=print_test, op_kwargs={'context': "collect_swedu"}, dag=dag
+    task_id="collect_swedu",
+    python_callable=print_test,
+    op_kwargs={"context": "collect_swedu"},
+    dag=dag,
 )
 collect_example2 = PythonOperator(
-    task_id="collect_example2", python_callable=print_test, op_kwargs={'context': "collect_example1"}, dag=dag
+    task_id="collect_example2",
+    python_callable=print_test,
+    op_kwargs={"context": "collect_example1"},
+    dag=dag,
 )
 
 aggregate_data = PythonOperator(
-     task_id="aggregate_data", python_callable=print_test, op_kwargs={'context': "mongodb"}, dag=dag
+    task_id="aggregate_data",
+    python_callable=print_test,
+    op_kwargs={"context": "mongodb"},
+    dag=dag,
 )
 
 transform_vector = PythonOperator(
-     task_id="transform_vector", python_callable=print_test, op_kwargs={'context': "vector"}, dag=dag
+    task_id="transform_vector",
+    python_callable=print_test,
+    op_kwargs={"context": "vector"},
+    dag=dag,
 )
 
 report = PythonOperator(
-     task_id="report", python_callable=print_test, op_kwargs={'context': "report"}, dag=dag
+    task_id="report",
+    python_callable=print_test,
+    op_kwargs={"context": "report"},
+    dag=dag,
 )
 
-[collect_khu_today, collect_example1, collect_example2] >> aggregate_data >> transform_vector >> report
+(
+    [collect_khu_today, collect_example1, collect_example2]
+    >> aggregate_data
+    >> transform_vector
+    >> report
+)
 # [END tutorial]

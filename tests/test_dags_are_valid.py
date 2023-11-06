@@ -33,7 +33,6 @@ class TestDagIntegrity(unittest.TestCase):
         cls.session = Session()
 
         for connection in cls.get_connections():
-
             cls.session.add(connection)
             cls.session.commit()
 
