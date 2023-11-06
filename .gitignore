@@ -1,3 +1,6 @@
+#For test
+*.ipynb
+
 # Airflow stuff
 logs/
 airflow.db
