@@ -5,6 +5,7 @@ from dags.modules.utils import singleton
 import openai
 from dotenv import load_dotenv
 from typing import Dict
+from tqdm import tqdm
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -48,7 +49,7 @@ class PineconeClient:
         return index
 
     def upsert_documents(self, documents):
-        vectors = [self._transform_pinecone_vector(doc) for doc in documents]
+        vectors = [self._transform_pinecone_vector(doc) for doc in tqdm(documents)]
         self.pinecone_index.upsert(vectors)
 
 

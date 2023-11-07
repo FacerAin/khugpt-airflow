@@ -76,7 +76,6 @@ class SweduCollector:
             soup = BeautifulSoup(response.text, "html.parser")
             for item in soup.select("#fboardlist > div > table > tbody > tr"):
                 if item.select(".notice_icon"):
-                    print("notice")
                     continue
                 link = item.find("a").get("href")
                 content_date = datetime.strptime(
