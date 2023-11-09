@@ -68,7 +68,9 @@ class PineconeClient:
             contents.append(doc['page_content'])
             ids.append(str(doc['_id']))
             metadatas.append({"page_url": doc["page_url"], 
-                "collected_at": doc["collected_at"]})
+                "collected_at": doc["collected_at"],
+                "text": doc['page_content']
+                })
             
         for i in range(0, len(documents), embedding_chunk_size):
             chunk_contents = contents[i:i+embedding_chunk_size]
