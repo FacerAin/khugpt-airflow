@@ -28,8 +28,8 @@ class SweduCollector:
         self.documents = self._get_documents(self.links)
         return self.documents
 
-    def upload_db(self):
-        client = PymongoClient(host="localhost", port=27017)
+    def upload_db(self, db_host="localhost", db_port=27017):
+        client = PymongoClient(host=db_host, port=db_port)
         client.insert_documents(self.documents)
 
     def _convert_to_json(self, documents):
@@ -75,20 +75,23 @@ class SweduCollector:
             )
             soup = BeautifulSoup(response.text, "html.parser")
             for item in soup.select("#fboardlist > div > table > tbody > tr"):
-                if item.select(".notice_icon"):
-                    continue
                 link = item.find("a").get("href")
                 content_date = datetime.strptime(
                     item.select(".td_datetime")[0].getText(), "%Y-%m-%d"
                 ).date()
-
-                if end_date < content_date:
-                    continue
-                elif start_date > content_date:
-                    is_break = True
-                    break
+                
+                #If the item is a notice, it must continue to do a full scan without stopping.
+                if item.select(".notice_icon"):
+                    if  start_date <= content_date<= end_date:
+                        links.append(link)
                 else:
-                    links.append(link)
+                    if end_date < content_date:
+                        continue
+                    elif start_date > content_date:
+                        is_break = True
+                        break
+                    else:
+                        links.append(link)
         return links
 
     def _get_documents(self, links):
