@@ -1,8 +1,7 @@
 from paddleocr import PaddleOCR
 import urllib.request
-
+ocr = PaddleOCR(lang="korean")
 def get_image_ocr(link):
-    ocr = PaddleOCR(lang="korean")
     try:
         img_bytes = urllib.request.urlopen(link).read()
         result = ocr.ocr(img_bytes, cls=False)
