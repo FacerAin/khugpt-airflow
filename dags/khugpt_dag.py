@@ -16,24 +16,26 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# [START import_module]
-from dotenv import load_dotenv
-from datetime import timedelta, date
 import os
+from datetime import date, timedelta
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
+
+# [START import_module]
+from dotenv import load_dotenv
+
+from dags.modules.collect.khutoday import KhutodayCollector
 from dags.modules.collect.swcon import SwconCollector
 from dags.modules.collect.swedu import SweduCollector
-from dags.modules.collect.khutoday import KhutodayCollector
 from dags.modules.database.pymongo import PymongoClient
 from dags.modules.vectorstore.pinecone import PineconeClient
 
 load_dotenv(verbose=True)
 
-PINECONE_API_KEY=os.environ['PINECONE_API_KEY']
-PINECONE_ENVIRONMENT_REGION=os.environ['PINECONE_ENVIRONMENT_REGION']
-OPENAI_API_KEY=os.environ['OPENAI_API_KEY']
+PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
+PINECONE_ENVIRONMENT_REGION = os.environ["PINECONE_ENVIRONMENT_REGION"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
@@ -86,6 +88,7 @@ dag = DAG(
 def print_test(context):
     print(f"test: {context}")
 
+
 def collector_khu_today(context: str):
     assert context == "khu_today"
     collector = KhutodayCollector
@@ -93,6 +96,7 @@ def collector_khu_today(context: str):
     if docs:
         collector.upload_db()
     print(f"collect {context}: {len(docs)} documents at {str(date.today())}")
+
 
 def collector_swedu(context: str) -> None:
     assert context == "swedu"
@@ -102,6 +106,7 @@ def collector_swedu(context: str) -> None:
         collector.upload_db()
     print(f"collect {context}: {len(docs)} documents at {str(date.today())}")
 
+
 def collector_swcon(context: str) -> None:
     assert context == "swcon"
     collector = SwconCollector()
@@ -110,16 +115,22 @@ def collector_swcon(context: str) -> None:
         collector.upload_db()
     print(f"collect {context}: {len(docs)} documents at {str(date.today())}")
 
+
 def transformer_vector(context: str) -> None:
     assert context == "vector"
     client = PymongoClient()
-    pinecone_client = PineconeClient(index_name="khugpt", pinecone_api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT_REGION, openai_api_key=OPENAI_API_KEY)
+    pinecone_client = PineconeClient(
+        index_name="khugpt",
+        pinecone_api_key=PINECONE_API_KEY,
+        environment=PINECONE_ENVIRONMENT_REGION,
+        openai_api_key=OPENAI_API_KEY,
+    )
     collection = client["khugpt"]["documents"]
     res = collection.find({})
     docs = []
     for doc in res:
         docs.append(doc)
-    
+
     if docs:
         pinecone_client.upsert_documents(docs)
 
