@@ -1,12 +1,13 @@
-import pinecone
 import os
+from itertools import islice
+from typing import Dict, Iterable, List
+
+import openai
+import pinecone
+from dotenv import load_dotenv
+from tqdm import tqdm
 
 from dags.modules.utils import singleton
-import openai
-from dotenv import load_dotenv
-from typing import Dict, List, Iterable
-from tqdm import tqdm
-from itertools import islice
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
