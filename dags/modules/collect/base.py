@@ -119,12 +119,12 @@ class BaseCollector(ABC):
             document.page_content = page_text + img_text
         return documents
 
-    def _extract_img_links(self, html: str)-> List[str]:
-        """ Extracts the paths of the image tags from a HTML formatted string.
+    def _extract_img_links(self, html: str) -> List[str]:
+        """Extracts the paths of the image tags from a HTML formatted string.
 
         Args:
             html: a HTML formatted string.
-        
+
         Returns:
             A list of links (str).
         """
@@ -145,7 +145,7 @@ class BaseCollector(ABC):
 
         Returns:
             A list of coverted docuements.
-        
+
         """
         items = []
         for document in documents:
