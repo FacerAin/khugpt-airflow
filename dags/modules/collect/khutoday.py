@@ -1,18 +1,15 @@
 from datetime import date, datetime, timedelta
-
-import requests
-from bs4 import BeautifulSoup
-from langchain.document_loaders import AsyncHtmlLoader
-from langchain.document_transformers import Html2TextTransformer
-from tqdm import tqdm
-from typing import List, Dict
+from typing import Dict, List
 from urllib.parse import urljoin
-import requests
 
+import requests
+from tqdm import tqdm
+
+from dags.modules.collect.base import BaseCollector
 from dags.modules.database.pymongo import PymongoClient
 
 
-class KhutodayCollector:
+class KhutodayCollector(BaseCollector):
     today_date = date.today()
     tomarrow_date = date.today() + timedelta(days=1)
 
@@ -24,16 +21,16 @@ class KhutodayCollector:
         self,
         start_date: datetime.date = today_date,
         end_date: datetime.date = tomarrow_date,
-    ):
+    ) -> List[Dict]:
         self.links = self._get_links(start_date, end_date)
         self.documents = self._get_documents(self.links)
         return self.documents
 
-    def upload_db(self, db_host="localhost", db_port=27017):
+    def upload_db(self, db_host: str = "localhost", db_port: int = 27017) -> None:
         client = PymongoClient(host=db_host, port=db_port)
         client.insert_documents(self.documents)
 
-    def _get_documents(self, links):
+    def _get_documents(self, links: List[str]) -> List[Dict]:
         documents = []
         for link in tqdm(links):
             response = requests.get(link)
@@ -54,8 +51,11 @@ class KhutodayCollector:
         return documents
 
     def _get_links(
-        self, start_date, end_date, host="http://163.180.142.196:9090/today_api/"
-    ):
+        self,
+        start_date: datetime.date,
+        end_date: datetime.date,
+        host: str = "http://163.180.142.196:9090/today_api/",
+    ) -> List[str]:
         links = []
         delta = end_date - start_date
         for i in range(delta.days):
