@@ -27,7 +27,7 @@ class SwconCollector:
     ):
         # TODO: Serve progress informations.
         self.links = self._get_links(start_date, end_date)
-        #self.documents = self._get_documents(self.links)
+        # self.documents = self._get_documents(self.links)
         self.documents = self._get_documents(self.links)
         return self.documents
 
@@ -47,24 +47,24 @@ class SwconCollector:
             )
 
         return items
-    
+
     def _clean_json_documents(self, json_documents: List[Dict]):
         clean_json_documents = []
         for document in json_documents:
-            document['page_content'] = self._clean_page_content(document['page_content'])
-            clean_json_documents.append(document
-        )
+            document["page_content"] = self._clean_page_content(
+                document["page_content"]
+            )
+            clean_json_documents.append(document)
         return clean_json_documents
-    
+
     def _clean_page_content(self, page_content: str):
         # Remove the header section based on the "## 공지사항"
-        clean_page_content = ' '.join(page_content.split("## 공지사항")[1:])
+        clean_page_content = " ".join(page_content.split("## 공지사항")[1:])
 
         # Remove the footer section based on the "* __다음글"
-        clean_page_content = ' '.join(clean_page_content.split("* __목록")[:-1])
+        clean_page_content = " ".join(clean_page_content.split("* __목록")[:-1])
 
         return clean_page_content
-
 
     def _get_links(self, start_date, end_date, max_page: int = 34):
         # TODO: How to determine max page?
@@ -80,19 +80,17 @@ class SwconCollector:
             for item in soup.select("#DoubleMajor_board_body > tr"):
                 link = item.select_one("td.text-left > a").get("href")
 
-                date_text =  item.select("td:nth-child(4) > span")[0].getText() 
+                date_text = item.select("td:nth-child(4) > span")[0].getText()
 
-                #If the item contains a colon, like 9:45, it means the datetime is today.
+                # If the item contains a colon, like 9:45, it means the datetime is today.
                 if ":" in date_text:
                     content_date = datetime.today().date()
                 else:
-                    content_date = datetime.strptime(
-                        date_text, "%Y-%m-%d"
-                    ).date()
-                
-                #If the item is a notice, it must continue to do a full scan without stopping.
+                    content_date = datetime.strptime(date_text, "%Y-%m-%d").date()
+
+                # If the item is a notice, it must continue to do a full scan without stopping.
                 if item.select(".mb-notice"):
-                    if  start_date <= content_date<= end_date:
+                    if start_date <= content_date <= end_date:
                         links.append(link)
                 else:
                     if end_date < content_date:
@@ -103,18 +101,25 @@ class SwconCollector:
                     else:
                         links.append(link)
         return links
-    
-    def _extract_img_links(self,html):
-        soup = BeautifulSoup(html, 'html.parser')
-        img_tags = soup.find_all('img')
+
+    def _extract_img_links(self, html):
+        soup = BeautifulSoup(html, "html.parser")
+        img_tags = soup.find_all("img")
         links = []
         for img_tag in img_tags:
-            src = img_tag['src']
+            src = img_tag["src"]
             if (".jpg" in src) or (".png" in src):
-                links.append(img_tag['src'])
+                links.append(img_tag["src"])
         return links
-    
-    def _transform_documents(self, documents, get_image = True, scope_selector = ".content-box", ignore_links=False, ignore_images=True):
+
+    def _transform_documents(
+        self,
+        documents,
+        get_image=True,
+        scope_selector=".content-box",
+        ignore_links=False,
+        ignore_images=True,
+    ):
         h = html2text.HTML2Text()
         h.ignore_links = ignore_links
         h.ignore_images = ignore_images
@@ -122,7 +127,7 @@ class SwconCollector:
         for document in tqdm(documents):
             page_text = ""
             img_text = ""
-            soup = BeautifulSoup(document.page_content, 'html.parser')
+            soup = BeautifulSoup(document.page_content, "html.parser")
             scope_html = str(soup.select_one(scope_selector))
             if get_image:
                 img_links = self._extract_img_links(scope_html)

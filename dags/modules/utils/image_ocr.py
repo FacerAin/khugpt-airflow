@@ -1,6 +1,9 @@
 from paddleocr import PaddleOCR
 import urllib.request
+
 ocr = PaddleOCR(lang="korean")
+
+
 def get_image_ocr(link):
     try:
         img_bytes = urllib.request.urlopen(link).read()
@@ -12,7 +15,6 @@ def get_image_ocr(link):
             sentences += f" {item[-1][0]}"
         return sentences
     except Exception as e:
-        #TODO: Exception Handling
+        # TODO: Exception Handling
         print(e)
         return ""
-    

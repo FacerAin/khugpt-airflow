@@ -44,24 +44,24 @@ class SweduCollector:
             )
 
         return items
-    
+
     def _clean_json_documents(self, json_documents: List[Dict]):
         clean_json_documents = []
         for document in json_documents:
-            document['page_content'] = self._clean_page_content(document['page_content'])
-            clean_json_documents.append(document
-        )
+            document["page_content"] = self._clean_page_content(
+                document["page_content"]
+            )
+            clean_json_documents.append(document)
         return clean_json_documents
-    
+
     def _clean_page_content(self, page_content: str):
         # Remove the header section based on the "## 공지사항"
-        clean_page_content = ' '.join(page_content.split("## 공지사항")[1:])
+        clean_page_content = " ".join(page_content.split("## 공지사항")[1:])
 
         # Remove the footer section based on the "* __다음글"
-        clean_page_content = ' '.join(clean_page_content.split("* __목록")[:-1])
+        clean_page_content = " ".join(clean_page_content.split("* __목록")[:-1])
 
         return clean_page_content
-
 
     def _get_links(self, start_date, end_date, max_page: int = 34):
         # TODO: How to determine max page?
@@ -71,7 +71,7 @@ class SweduCollector:
             if is_break:
                 break
             response = requests.get(
-                f"https://swedu.khu.ac.kr/board5/bbs/board.php?bo_table=06_01&page={page}"
+                f"https://swedu.khu.ac.kr/bbs/board.php?bo_table=07_01&page={page}"
             )
             soup = BeautifulSoup(response.text, "html.parser")
             for item in soup.select("#fboardlist > div > table > tbody > tr"):
@@ -79,10 +79,10 @@ class SweduCollector:
                 content_date = datetime.strptime(
                     item.select(".td_datetime")[0].getText(), "%Y-%m-%d"
                 ).date()
-                
-                #If the item is a notice, it must continue to do a full scan without stopping.
+
+                # If the item is a notice, it must continue to do a full scan without stopping.
                 if item.select(".notice_icon"):
-                    if  start_date <= content_date<= end_date:
+                    if start_date <= content_date <= end_date:
                         links.append(link)
                 else:
                     if end_date < content_date:

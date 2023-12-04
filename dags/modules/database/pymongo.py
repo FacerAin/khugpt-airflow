@@ -5,7 +5,6 @@ from dags.modules.utils import singleton
 
 @singleton
 class PymongoClient:
-
     def __init__(self, host="localhost", port=27017):
         self.client = self.get_client_connection(host, port)
         self.collection = self.client["khugpt"]["documents"]
