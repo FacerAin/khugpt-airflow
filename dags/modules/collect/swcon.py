@@ -1,16 +1,13 @@
 from datetime import date, datetime, timedelta
 from typing import Dict, List
 
-import html2text
 import requests
 from bs4 import BeautifulSoup
 from langchain.document_loaders import AsyncHtmlLoader
-from langchain.document_transformers import Html2TextTransformer
 from tqdm import tqdm
 
 from dags.modules.collect.base import BaseCollector
 from dags.modules.database.pymongo import PymongoClient
-from dags.modules.utils.image_ocr import get_image_ocr
 
 SWCON_TARGET_LINK = "http://swcon.khu.ac.kr/wordpress/post/?mode=list&board_page="
 
@@ -35,7 +32,7 @@ class SwconCollector(BaseCollector):
         self.documents = self._get_documents(self.links)
         return self.documents
 
-    def upload_db(self, db_host: str = "localhost", db_port: int = 27017):
+    def upload_db(self, db_host: str = "localhost", db_port: int = 27017) -> None:
         client = PymongoClient(host=db_host, port=db_port)
         client.insert_documents(self.documents)
 

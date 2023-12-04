@@ -11,6 +11,7 @@ from dags.modules.database.pymongo import PymongoClient
 
 SWEDU_TARGET_LINK = "https://swedu.khu.ac.kr/bbs/board.php?bo_table=07_01&page="
 
+
 class SweduCollector(BaseCollector):
     today_date = date.today()
     tomarrow_date = date.today() + timedelta(days=1)
