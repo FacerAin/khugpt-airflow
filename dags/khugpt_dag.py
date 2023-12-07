@@ -41,6 +41,7 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+import tiktoken
 
 # [END import_module]
 
@@ -125,10 +126,16 @@ def transformer_vector(context: str) -> None:
         environment=PINECONE_ENVIRONMENT_REGION,
         openai_api_key=OPENAI_API_KEY,
     )
+    encoding = tiktoken.get_encoding("cl100k_base")
     collection = client["khugpt"]["documents"]
     res = collection.find({})
     docs = []
     for doc in res:
+        num_tokens = len(encoding.encode['page_content'])
+        #TODO: Need to process token over
+        if num_tokens > 8000:
+            print(doc)
+            continue
         docs.append(doc)
 
     if docs:
