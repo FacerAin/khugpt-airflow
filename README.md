@@ -1,115 +1,174 @@
-# Airflow Codebase Template
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a name="readme-top"></a>
+[![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url] [![Pull Request][pr-shield]][pr-url] [![MIT License][license-shield]][license-url]
 
-## Background
 
-Apache Airflow is the leading orchestration tool for batch workloads. Originally conceived at Facebook and eventually open-sourced at AirBnB, Airflow allows you to define complex directed acyclic graphs (DAG) by writing simple Python. 
 
-Airflow has a number of built-in concepts that make data engineering simple, including DAGs (which describe how to run a workflow) and Operators (which describe what actually gets done). See the Airflow documentation for more detail: https://airflow.apache.org/concepts.html 
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/FacerAin/khugpt-airflow">
+    <img src="./docs/logo.png" alt="Logo" width="200" height="200">
+  </a>
 
-Airflow also comes with its own architecture: a database to persist the state of DAGs and connections, a web server that supports the user-interface, and workers that are managed together by the scheduler and database. Logs persist both in flat files and the database, and Airflow can be setup to write remote logs (to S3 for example). Logs are viewable in the UI.
+<h3 align="center">KHUGPT airflow Engine</h3>
 
-![Airflow Architecture](docs/airflow_architecture.png)
+  <p align="center">
+  Data workflow for KHUGPT using airflow.
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <a href="https://github.com/FacerAin/khugpt-airflow/issues">Report Issues</a>
+    ·
+    <a href="https://github.com/FacerAin/khugpt-airflow/pulls">Pull Requests</a>
+  </p>
+</div>
 
-## A Note on managing Airflow dependencies
 
-Airflow is tricky to install correctly because it is both an application and a library. Applications freeze their dependencies to ensure stability, while libraries leave their dependencies open for upgrades to take advantage of new features. Airflow is both, so it doesn't freeze dependencies. This means that depending on the day, a simple `pip install apache-airflow` is not guaranteed to produce a workable version of the Airflow application. 
+### :card_file_box: Built With
+#### :bulb: Language
+[![Python][Python]][Python-url]
+#### :bulb: Frameworks
+[![Airflow][Airflow]][Airflow-url]
 
-To combat this, Airflow provides a set of [constraints files](https://airflow.apache.org/docs/apache-airflow/stable/installation.html#constraints-files) that are known working versions of Airflow. 
 
-This template installs Airflow using the constraints file at `https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt` and allows for building a custom Airflow image on top of this constraints file by simply adding additional dependencies to `airflow.requirements.txt`. Local dependencies are added to `local-requirements.txt`. 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Why not just use the [official docker-compose file](https://github.com/apache/airflow/blob/master/docs/apache-airflow/start/docker-compose.yaml)?
 
-It's easier to customize our additional dependencies with Airflow by building our own image. The master Airflow image doesn't allow this kind of low-level control. 
 
-This template is particularly useful to Airflow power users that tend to write a lot of custom plugins or functionality using external dependencies. 
+<!-- GETTING STARTED -->
+## :rocket: Getting Started
 
-### Why not just extend off of the [official Airflow image](https://airflow.apache.org/docs/apache-airflow/stable/production-deployment.html#production-container-images)?
+### :zap: Prerequisites
+- [python v3.8+](https://www.python.org/)
+- [docker v18+](https://www.docker.com/)
 
-You can do this, but customizing the image yields far more optimizations, and doesn't come with any additional complexity. To add Airflow extras, you can simply add it to the `AIRFLOW_EXTRAS` variable in the Makefile:
+### 🚀 Guideline
 
-        AIRFLOW_EXTRAS := postgres,google
+I recommend building your environment on top of a **virtual environment** or **docker container**. (e.g., venv, anaconda, etc.)
+* **Running Airflow locally**
+  
+  ```sh
+  #start airflow
+  make start-airflow
 
-To install any other pip dependencies, simply add it to `airflow.requirements.txt`.
+  #stop airflow
+  make stop-airflow
+  ```
 
-## Getting Started
+* **Linting & Testing**
+  
+  ```sh
+  # Linting
+  make lint
 
-This repository was created with `Python 3.8.6`, but should work for all versions of Python 3. 
+  # Testing
+  make test
+  ```
+* **Cleaning up your local environment**
 
-DAGs should be developed & tested locally first, before being promoted to a development environment for integration testing. Once DAGs are successful in the lower environments, they can be promoted to production. 
+  ```sh
+  make reset-airflow
+  ```
 
-Code is contributed either in `dags`, a directory that houses all Airflow DAG configuration files, or `plugins`, a directory that houses Python objects that can be used to extend Airflow.
 
-### Running Airflow locally
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-This project uses a Makefile to consolidate common commands and make it easy for anyone to get started. To run Airflow locally, simply:
 
-        make start-airflow
 
-This command will build your local Airflow image and start Airflow automatically!
 
-Navigate to http://localhost:8080/ and start writing & testing your DAGs! Login with the user-password combo: `admin:admin` (you can change this in `docker-compose.yaml`).
 
-You'll notice in `docker-compose.yaml` that both DAGs and plugins are mounted as volumes. This means once Airflow is started, any changes to your code will be quickly synced to the webserver and scheduler. You shouldn't have to restart the Airflow instance during a period of development! 
+## :globe_with_meridians: Features
+- Providing collectors for data collection
+- Loading into NoSQL (e.g., MongoDB)
+- Trasform and load for loading into Vector Store (e.g., Pinecone)
 
-When you're done, simply:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-        make stop-airflow
+<!-- CONTRIBUTING -->
+## :fire: Contributing
+Please refer to [CONTRIBUTING.md](https://github.com/FacerAin/khugpt-airflow/blob/main/CONTRIBUTING.md) for Contribution.
 
-### Testing & Linting
+For issues, new functions and requests to modify please follow the following procedure. 🥰
 
-Instantiating a local virtual environment is now entirely optional. You can develop entirely through Docker, as Airflow runs inside of docker-compose and `test-docker` and `lint-docker` provide avenues for running those steps without a virtual environment. 
+1. Fork the Project
+2. Create a Issue when you have new feature or bug, just not Typo fix
+3. Create your Feature Branch from dev Branch (`git checkout -b feat/Newfeature`)
+4. Commit your Changes (`git commit -m 'feat: add new feature'`)
+5. Push to the Branch (`git push origin feat/Newfeature`)
+6. Open a Pull Request to dev branch with Issues
 
-However, not using a virtual environment also means sacrificing any linting/language-server functionality provided by your IDE. To setup your virtual environment:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-        make  venv
 
-This project is also fully linted with black and pylint, even using a cool pylint plugin called [pylint-airflow](https://pypi.org/project/pylint-airflow/). To run linting:
 
-With your virtual environment: 
+<!-- LICENSE -->
+## :closed_lock_with_key: License
+Please refer to `LICENSE` for LICENSE.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-        make lint
 
-With Docker:
 
-        make lint-docker
+<!-- CONTACT -->
+## :speech_balloon: Contact
 
-Any tests can be placed under `tests`, we've already included a few unit tests for validating all of your DAGs and plugins to make sure they're valid to install in Airflow. To run tests:
+<table>
+  <tbody>
+    <tr>
+      <td align="center"><a href="https://github.com/FacerAin"><img src="https://avatars.githubusercontent.com/u/16442978?v=4" width="100px;" alt=""/><br /><sub><b>Yongwoo Song</b></sub></a></td>
+    </tr>
+  </tobdy>
+</table>
 
-With your virtual environment:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-        make test
 
-Inside Docker:
-        
-        make test-docker
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/FacerAin/khugpt-airflow.svg?style=flat
+[contributors-url]: https://github.com/FacerAin/khugpt-airflow/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/FacerAin/khugpt-airflow.svg?style=flat
+[forks-url]: https://github.com/FacerAin/khugpt-airflow/network/members
+[stars-shield]: https://img.shields.io/github/stars/FacerAin/khugpt-airflow.svg?style=flat
+[stars-url]: https://github.com/FacerAin/khugpt-airflow/stargazers
+[issues-shield]: https://img.shields.io/github/issues/FacerAin/khugpt-airflow.svg?style=flat
+[issues-url]: https://github.com/FacerAin/khugpt-airflow/issues
+[pr-url]: https://github.com/FacerAin/khugpt-airflow/pulls
+[pr-shield]: https://img.shields.io/github/issues-pr/FacerAin/khugpt-airflow.svg?style=flat
+[license-shield]: https://img.shields.io/github/license/FacerAin/khugpt-airflow.svg?style=flat
+[license-url]: https://github.com/FacerAin/khugpt-airflow/blob/master/LICENSE.txt
 
-### Cleaning up your local environment
+[Python]: https://img.shields.io/badge/Python-14354C?style=for-the-badge&logo=python&logoColor=white
+[Python-url]: https://www.python.org/
 
-If at any point you simply want to clean up or reset your local environment, you can run the following commands:
+[Fastapi]: https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
+[Fastapi-url]: https://fastapi.tiangolo.com/ko/
 
-Reset your local docker-compose:
+[Airflow]: https://img.shields.io/badge/apacheairflow-017CEE?style=for-the-badge&logo=apacheairflow
+[Airflow-url]: https://airflow.apache.org/
 
-        make reset-airflow
 
-Rebuild the local Airflow image for docker-compose (useful if you make changes to the Dockerfile):
-        
-        make rebuild-airflow
-
-Clean up Pytest artifacts:
-        
-        make clean-pytest
-
-Reset your virtual environment:
-
-        make clean-venv
-
-Start completely from scratch:
-
-        make clean-all
-
-### Deployment
-
-Once you've written your DAGs, the next step is to deploy them to your Airflow instance. This is a matter of syncing the `dags` and `plugins` directories to their respective destinations. 
-
-TODO: add some examples and documentation of deployments to different Airflow cloud providers (Astronomer, Cloud Composer, etc.) using different CI technologies (CircleCI, Github Actions, etc.)
+[Yarn]: https://img.shields.io/badge/yarn-%232C8EBB.svg?style=flat&logo=yarn&logoColor=white
+[Yarn-url]: https://yarnpkg.com/
+[ESLint]: https://img.shields.io/badge/ESLint-4B3263?style=flat&logo=eslint&logoColor=white
+[ESLint-url]: https://eslint.org/
+[Vue]: https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vuedotjs&logoColor=white
+[Vue-url]: https://vuejs.org/
+[Go]: https://img.shields.io/badge/Go-00ADD8?style=flat&logo=Go&logoColor=white
+[Go-url]: https://go.dev/
+[Terraform]: https://img.shields.io/badge/Terraform-430098?style=flat&logo=Terraform&logoColor=white
+[Terraform-url]: https://www.terraform.io/
+[aws]: https://img.shields.io/badge/AmazonAWS-232F3E?style=flat&logo=AmazonAWS&logoColor=white
+[aws-url]: https://aws.amazon.com/
+[OCI]: https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=black
+[OCI-url]: https://www.oracle.com/kr/cloud/
+[Kubernetes]: https://img.shields.io/badge/Kubernetes-326CE5?style=flat&logo=Kubernetes&logoColor=white
+[Kubernetes-url]: https://kubernetes.io/ko/
+[Github-actions]: https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=github-actions&logoColor=white
+[Github-actions-url]: https://github.com/features/actions
+[Helm]: https://img.shields.io/badge/Helm-326CE5?style=flat&logo=Helm&logoColor=white
+[Helm-url]: https://helm.sh/
+[Accordian]: https://img.shields.io/badge/Accordian-430098?style=flat&logo=Accordian&logoColor=white
+[Accordian-url]: https://accordions.co.kr/
